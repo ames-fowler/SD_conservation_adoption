@@ -35,7 +35,17 @@ g_legend<-function(a.gplot){
 
 landtypes_man<-raster("./Data/processed_data/landtypes/landtype_2.tif")
 WA <- map_data("state", c("washington"))
+coordinates(WA) <- c( "long","lat")
+crs(WA) <- CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+WA <- spTransform(WA, crs(thorn_mask))
+WA <- as.data.frame(WA)
+
 WA_co <- map_data("county", c("washington"))
+coordinates(WA_co) <- c( "long","lat")
+crs(WA_co) <- CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+WA_co <- spTransform(WA_co, crs(thorn_mask))
+WA_co <- as.data.frame(WA_co)
+
 huc12 <- readOGR(dsn = file.path("./Data/extent/HUC12.shp"), stringsAsFactors = F)
 xy <- WA[,c(1,2)]
 # xy <- WA_co[,c(1,2)]
@@ -53,9 +63,9 @@ thorn_man<- crop(landtypes_man, thorn_mask) %>% mask(thorn_mask)
 
 spdf <- SpatialPointsDataFrame(coords = xy, data = WA,
                                proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
-
-thorn_mask_ll <- spTransform(thorn_mask, crs(spdf))
-thorn_man_ll <- projectRaster(thorn_man, crs = crs(spdf), method = 'ngb')
+spdf_utm <- spTransform(spdf, crs(thorn_mask))
+thorn_mask_ll <- spTransform(thorn_mask, crs(spdf_utm)) ##clean up -- moving to utm
+thorn_man_ll <- projectRaster(thorn_man, crs = crs(spdf_utm), method = 'ngb')
 thorn_man_ll <- crop(thorn_man_ll, thorn_mask_ll)
 
 # unique(thorn_man_ll)
@@ -118,7 +128,7 @@ m <- gplot(man,maxpixels=30000000) +
   theme_minimal()+coord_equal()+
   geom_path(data=thorn_mask_ll,
             aes(x=long, y=lat, group=group))+
-  labs(x="\nLongitude", y="Latitude\n")+ theme(strip.text=element_blank())
+  labs(x="\nEasting (m)", y="Northing (m)\n")+ theme(strip.text=element_blank())
 
 
 # m
@@ -136,11 +146,11 @@ wa_plot <- ggplot()+
 
 
 site_map <- ggdraw() + draw_plot(m)+
-  draw_plot(plot = wa_plot, -.23, -.075, scale=.33)
+  draw_plot(plot = wa_plot, -.21, -.077, scale=.33)
         
 site_map
     
-ggsave(filename="./figures/site_map_10.28.20.png",
+ggsave(filename="./figures/site_map_UTM_20.11.18.png",
        plot=site_map,
        width=6.5,
        height=3.5)

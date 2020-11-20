@@ -155,14 +155,15 @@ plot(t_hills)
 t_hills_df <- rasterToPoints(t_hills)
 t_hills_df <- merge(t_hills_df, wide_df, by.x = "T_hills_w", by.y = "Topaz" )
 
+######  reclass topaz raster to esed delivery and CLT ----------- 
 all_topaz <-  unique(t_hills) %>% as.data.frame()
 names(all_topaz)<-  "T_hills_w"
 r1 <- t_hills_df[,c("T_hills_w","erosion_ct_ton")]
 r2 <- t_hills_df[,c("T_hills_w","erosion_int")]
 
-test <- merge (all_topaz, r1, all.x=T)%>% na.replace(0)                    
+test <- merge (all_topaz, r1, all.x=T)#%>% na.replace(0)                    
 
-test2 <- merge (all_topaz, r2, all.x=T) %>% na.replace(0)                    
+test2 <- merge (all_topaz, r2, all.x=T) #%>% na.replace(0)                    
 
 reclass_df1<- matrix(rbind(test2$T_hills_w,test2$erosion_int %>% as.factor()),
                      ncol = 2, 
@@ -172,13 +173,20 @@ reclass_df2<- matrix(rbind(test$T_hills_w, test$erosion_ct_ton),
                      byrow = T)
 erosion_rast <- reclassify(t_hills, reclass_df2)
 clt_raster <- reclassify(t_hills, reclass_df1)
-plot(clt_raster)
+plot(erosion_rast)
 raste_df <- rasterFromXYZ(t_hills_df, ) 
 
+### recalss sed deliver from ton/acre to kg/m2 max at 20? ---------------
 
+max(unique(erosion_rast))*.22417
 
+reclass_list <- c(180,1000,190)
+reclass_df3<- matrix(reclass_list,
+                     ncol = 3, 
+                     byrow = T)
 
-
+erosion_rast_kgm_limit <- reclassify(erosion_rast, reclass_df3)*.22417
+plot(erosion_rast_kgm_limit, col = rev(magma(100)))
 
 
 my_col_man <-rev(c(viridis(5)))
@@ -216,9 +224,31 @@ spatial_CLT <- gplot(clt_raster,maxpixels=30000000) +
    theme_minimal()+coord_equal()+
   # geom_path(data=thorn_mask,
   #           aes(x=long, y=lat, group=group))+
-  labs(x="\nNorthing", y="Easting\n")+ theme(strip.text=element_blank())
+  labs(x="\n Easting(m)", y="Northing (m)\n")+ theme(strip.text=element_blank())
 
 ggsave("./figures/spatial_CLT.png", 
        plot = spatial_CLT,
+       width=6.5,
+       height=3.5)
+
+plot(erosion_rast_kgm_limit*.22417, col = (magma(100)), alpha =.8)
+
+
+my_col_man <-rev(c(viridis(5)))
+
+my_col_man_labs <- c("CLT 1", "CLT 2","CLT 3","CLT 4",
+                     "CLT 5")
+pal <- scale_color_viridis(alpha = .8, option = "magma")
+spatial_erosion <- gplot(erosion_rast_kgm_limit,maxpixels=30000000) + 
+  geom_tile(aes(fill = value)) +#
+  facet_wrap(~ variable) +
+  scale_fill_gradientn(colors= magma(10, alpha = .8),na.value="transparent", name = expression(paste("Erosion Kg"/"m"^"2"))) + 
+  theme_minimal()+coord_equal()+
+  # geom_path(data=thorn_mask,
+  #           aes(x=long, y=lat, group=group))+
+  labs(x="\n Easting(m)", y="Northing (m)\n")+ theme(strip.text=element_blank())
+
+ggsave("./figures/spatial_erosion.png", 
+       plot = spatial_erosion,
        width=6.5,
        height=3.5)
