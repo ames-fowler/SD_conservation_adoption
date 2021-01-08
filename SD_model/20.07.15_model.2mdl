@@ -1,0 +1,1741 @@
+{UTF-8}
+CRP fund effectiveness[land type]  = A FUNCTION OF( CRP acres funded,nonCRP area) ~~|
+CRP fund effectiveness[land type]=
+	CRP acres funded[land type]*(min(1/nonCRP area[land type],1))*(1-price factor)
+	~	ha/Year
+	~	potential CRP that could be funded, funded is confusing, effectiveness. -> adoption \
+		from CRP funds... 
+		
+		Account for unspent money
+	|
+
+CT to Nt[land type]=
+	min(NT CT fund effectiveness[land type]+NT CT word of mouth[land type],1)*CT farmed area\
+		[land type]
+	~	ha
+	~		|
+
+NT CT word of mouth[land type]=
+	(sum(NT farmed area[land type!])/sum(total area[land type!])*NT CT word of mouth effectiveness\
+		)
+	~	1/Year
+	~		|
+
+NT percent=
+	sum(NT farmed area[land type!])/sum(total area[land type!])
+	~	
+	~		|
+
+Annual funds out=
+	Funds to CRP+Funds to conservation tillage
+	~	dollar/Year
+	~		|
+
+Cnstant reduced tillage funding=
+	0.0185*1e+006
+	~	
+	~	assuming 1 mil of investment, modeled as direct pamnet popular now, but \
+		representing sciece communication. Perhaos this should all be worked into \
+		a transient word of mouth effecivness but that becomes very hand wavey too \
+		and this is cleaner.
+	|
+
+CRP Percent=
+	sum(CRP area[land type!])/sum(total area[land type!])
+	~	
+	~		|
+
+Funds to CRP=
+	Funds to CRP percent*Total conservation funds
+	~	
+	~		|
+
+CRP data percent:INTERPOLATE::=
+	GET DIRECT DATA( 'nass_concs_adopt/Data/processed_data/till.xlsx' , 'Sheet1', 'A' , \
+		'Q2' )
+	~	
+	~		|
+
+erosion reduction per conservation funds=
+	delta erosion/(annual funds)
+	~	Mg/dollar
+	~		|
+
+till funding switch=
+	1
+	~	
+	~		|
+
+ct data percent:=
+	GET DIRECT DATA( 'nass_concs_adopt/Data/processed_data/till.xlsx' , 'tillage_data_percent'\
+		, 'A' , 'D2' )
+	~	
+	~		|
+
+CRP data switch=
+	0
+	~	
+	~	value of 1 data on (circular) or 0 constant funding source.
+	|
+
+CRP ended contract due to completion[land type]=
+	CRP area[land type]/CRP contract length
+	~	ha/Year
+	~	seperate put the price factor impact on bailing. verbage is more clear to what is \
+		happening.
+		first order effect : CRP area[land type]/CRP contract length
+		delay fix (CRP inflow[land type],CRP contract length,0) <- this provides a \
+		ten year increase to equalibrium. it makes sense but does not account for \
+		th eprograms evolution or growth.
+	|
+
+nt percent data:INTERPOLATE::=
+	GET DIRECT DATA( 'nass_concs_adopt/Data/processed_data/till.xlsx' , 'tillage_data_percent'\
+		, 'A' , 'B2' )
+	~	
+	~		|
+
+CT percent=
+	sum(CT farmed area[land type!])/sum(total area[land type!])
+	~	
+	~		|
+
+mt data percent:=
+	GET DIRECT DATA( 'nass_concs_adopt/Data/processed_data/till.xlsx' , 'tillage_data_percent'\
+		, 'A' , 'C2' )
+	~	
+	~		|
+
+Funds to conservation tillage=
+	Total conservation funds-Funds to CRP
+	~	
+	~	Several pots of money contribute to conservation tillage management. \
+		Ideallized as a single pot these funds can be used either for NT or CT, \
+		CRP funds are from a seperate program. (Johnson adn Boylan 2019)
+	|
+
+CRP withman funding:=
+	GET DIRECT DATA( 'nass_concs_adopt/Data/processed_data/till.xlsx' , 'CRP_funding', 'A'\
+		 , 'B2' )
+	~	
+	~		|
+
+MT percent=
+	sum(MT farmed area[land type!])/sum(total area[land type!])
+	~	
+	~		|
+
+annual funds=
+	funds
+	~	dollar/Year [0,1e+006,10000]
+	~		|
+
+funds=
+	250000
+	~	 [0,1e+006,10000]
+	~		|
+
+nt pre=
+	sum(NT farmed area[land type!])/sum(total area[land type!])
+	~	
+	~		|
+
+CRP pre=
+	sum(CRP area[land type!])/sum(total area[land type!])
+	~	
+	~		|
+
+CRP acres funded[land type]=
+	IF THEN ELSE( Time>1985, CRP funds[land type]/(CRP payment*CRP contract length),0)
+	~	
+	~		|
+
+NT acres funded[land type]=
+	NT funding[land type]/(NT payment*NT contract length)
+	~	
+	~		|
+
+NT CT fund effectiveness[land type]=
+	NT acres funded[land type]/max(nonNT area[land type],1)
+	~	
+	~	fix max - not needed
+	|
+
+ct pre=
+	sum(CT farmed area[land type!])/sum(total area[land type!])
+	~	
+	~		|
+
+mt pre=
+	sum(MT farmed area[land type!])/sum(total area[land type!])
+	~	
+	~		|
+
+CRP funding[land type]=
+	CRP funds[land type]
+	~	dollar/Year
+	~		|
+
+test[land type]= INTEG (
+	CRP funding[land type],
+		0)
+	~	
+	~		|
+
+To MT[land type]=
+	Funds to conservation tillage*Targeting MT[land type]*(1-NT payment ratio)
+	~	dollar/Year
+	~		|
+
+CRP to CT[land type]=
+	(CRP ended contract due to completion[land type]+CRP ended contracts due to price[land type\
+		])*nonCRP CT Ratio[land type
+]
+	~	ha/Year
+	~		|
+
+CRP to MT[land type]=
+	(CRP ended contract due to completion[land type]+CRP ended contracts due to price[land type\
+		])*nonCRP MT Ratio[land type
+]
+	~	ha/Year
+	~		|
+
+CRP to NT[land type]=
+	(CRP ended contract due to completion[land type]+CRP ended contracts due to price[land type\
+		])*nonCRP NT ratio[land type
+]
+	~	ha/Year
+	~		|
+
+MT CT fund effectiveness[land type]=
+	MT acres funded[land type]/max(nonMT area[land type],1)
+	~	
+	~		|
+
+CRP ended contracts due to price[land type]=
+	CRP area[land type]
+	~	
+	~		|
+
+NT MT word of mouth[land type]=
+	(sum(NT farmed area[land type!])/sum(total area[land type!])*NT MT word of mouth efficiency\
+		)
+	~	
+	~		|
+
+To NT[land type]=
+	Funds to conservation tillage*Targeting NT[land type]*NT payment ratio
+	~	dollar/Year
+	~		|
+
+NT payment ratio=
+	NT payment/(MT payment+NT payment)
+	~	
+	~		|
+
+NT to MT[land type]=
+	NT farmed area[land type]*(MT word of mouth[land type])
+	~	ha/Year
+	~		|
+
+NT MT word of mouth efficiency=
+	0.18
+	~	 [0,1,0.005]
+	~		|
+
+To CRP[land type]=
+	Funds to CRP*Targeting CRP[land type]
+	~	dollar/Year
+	~		|
+
+MT to NT[land type]=
+	MT farmed area[land type]*(NT MT word of mouth[land type]+NT CT fund effectiveness[land type\
+		])
+	~	ha/Year
+	~		|
+
+funds spent[land type]=
+	CRP payment*(CT to CRP[land type]+MT to CRP[land type]+NT to CRP[land type])+NT payment\
+		*(CRP to NT
+[land type]+MT to NT[land type]+CT to Nt[land type])
+	~	
+	~		|
+
+CRP CT fund effectiveness[land type]=
+	CRP fund effectiveness[land type]*CT farmed area[land type]
+	~	
+	~		|
+
+CRP word of mouth[land type]=
+	CRP area[land type]/total area[land type]*CRP word of mounth efficiency
+	~	ha/Year
+	~	"contact rate*adoption fraction" = constqant that controls...
+	|
+
+CRP CT word of mouth[land type]=
+	CRP word of mouth[land type]*CT farmed area[land type]
+	~	
+	~		|
+
+CT to CRP[land type]=
+	CRP CT fund effectiveness[land type]+CRP CT word of mouth[land type]
+	~	ha/Year
+	~	Bass diffusion
+	|
+
+MT to CT[land type]=
+	MT out Coefficient*MT farmed area[land type]
+	~	ha
+	~	Simple return rate - not yet price dependant - this could be connected to \
+		profit margin with convor stocks or ...
+	|
+
+MT word of mouth[land type]=
+	sum(MT farmed area[land type!])/sum(total area[land type!])*MT word of mounth effectiveness
+	~	
+	~		|
+
+MT word of mounth effectiveness=
+	0.125
+	~	 [0,1,0.005]
+	~	calibrated to data
+	|
+
+NT funding[land type]=
+	NT funds[land type]
+	~	dollar/Year
+	~		|
+
+CT to MT[land type]=
+	CT farmed area[land type]*(MT CT fund effectiveness[land type]+MT word of mouth[land type\
+		])
+	~	ha
+	~		|
+
+nonMT area[land type]=
+	total area[land type]-MT farmed area[land type]
+	~	
+	~		|
+
+nonNT area[land type]=
+	total area[land type]-NT farmed area[land type]
+	~	
+	~		|
+
+NT CT word of mouth effectiveness=
+	0.06
+	~	1/Year [0,1,0.005]
+	~	calibration factor. describes farmer connectedness _ is this different for \
+		different practices - risk or profit margin described here.
+	|
+
+NT farmed area[land type]= INTEG (
+	CRP to NT[land type]+CT to Nt[land type]+MT to NT[land type]-NT to CRP[land type]-NT to CT\
+		[land type]-NT to MT[land type],
+		0*total area[land type])
+	~	ha
+	~	.05
+	|
+
+MT acres funded[land type]=
+	MT funds[land type]/(MT payment*MT contract length)
+	~	ha/Year
+	~		|
+
+NT to CT[land type]=
+	NT farmed area[land type]*NT out coefficient
+	~	ha/Year
+	~	how to figure this out - talk to dave.
+	|
+
+MT out Coefficient=
+	0.015
+	~	
+	~	Constant - need support
+	|
+
+MT to CRP[land type]=
+	MT farmed area[land type]*(CRP word of mouth[land type]+CRP fund effectiveness[land type\
+		])
+	~	ha/Year
+	~		|
+
+NT out coefficient=
+	0.005
+	~	1/Year
+	~	FIX why do people revert - make this meaningful
+	|
+
+MT farmed area[land type]= INTEG (
+	CRP to MT[land type]+CT to MT[land type]+NT to MT[land type]-MT to CRP[land type]-MT to CT\
+		[land type]-MT to NT[land type],
+		0*total area[land type])
+	~	ha
+	~	.15
+	|
+
+NT funds[land type]= INTEG (
+	To NT[land type]-NT funding[land type],
+		To NT[land type])
+	~	dollar
+	~		|
+
+MT funding[land type]=
+	MT funds[land type]
+	~	dollar/Year
+	~		|
+
+NT to CRP[land type]=
+	NT farmed area[land type]*(CRP fund effectiveness[land type]+CRP word of mouth[land type\
+		])
+	~	ha/Year
+	~		|
+
+MT funds[land type]= INTEG (
+	To MT[land type]-MT funding[land type],
+		To MT[land type])
+	~	dollar
+	~		|
+
+CRP word of mounth efficiency=
+	0.005
+	~	1/Year
+	~	clibration factor - from data - attain data
+	|
+
+CRP contract length=
+	10
+	~	Year
+	~	Bell 2017 personal communictions
+	|
+
+nonCRP CT Ratio[land type]=
+	CT farmed area[land type]/nonCRP area[land type]
+	~	1
+	~		|
+
+nonCRP MT Ratio[land type]=
+	MT farmed area[land type]/nonCRP area[land type]
+	~	1
+	~		|
+
+CT farmed area[land type]= INTEG (
+	CRP to CT[land type]+MT to CT[land type]+NT to CT[land type]-CT to CRP[land type]-CT to MT\
+		[land type]-CT to Nt[land type],
+		total area[land type]*1)
+	~	ha
+	~		|
+
+NT contract length=
+	3
+	~	Year
+	~	Stephan Johnson
+	|
+
+nonCRP area[land type]=
+	(total area[land type]-CRP area[land type])
+	~	ha
+	~	This is the nonCRP ha used to find the fraction of the area that CRP to CT \
+		funds are applied to. It is the denomiator of the ration "CT farmed \
+		area/(total area - CRP area)"
+	|
+
+Targeting MT[land type]=
+	0.02884,
+	0.04811,
+	0.08486,
+	0.15459,
+	0.6836
+	~	Dmnl
+	~	base line
+		0.02884,
+		0.04811,
+		0.08486,
+		0.15459,
+		0.68360
+		
+		targeting 1
+		0.17820,
+		0.29734,
+		0.52446,
+		0.00000,
+		0.00000
+		
+		Targeting 2
+		0.00000,
+		0.00000,
+		0.09194,
+		0.16748,
+		0.74058
+	|
+
+MT contract length=
+	3
+	~	Year
+	~	unknown and unused at this point
+		3 (johnson 2018) balance 0-5 years
+	|
+
+nonCRP NT ratio[land type]=
+	NT farmed area[land type]/nonCRP area[land type]
+	~	1
+	~		|
+
+MT payment=
+	100
+	~	dollar/ha [1,500]
+	~	no limit on funding area or dollars currently
+	|
+
+test summed=
+	sum(funds spent[land type!])
+	~	
+	~		|
+
+CRP area[land type]= INTEG (
+	CT to CRP[land type]+MT to CRP[land type]+NT to CRP[land type]-CRP to CT[land type]-\
+		CRP to MT[land type]-CRP to NT[land type],
+		0*total area[land type])
+	~	ha
+	~	.1, 0*total area[land type]
+	|
+
+CRP funds[land type]= INTEG (
+	To CRP[land type]-CRP funding[land type],
+		To CRP[land type])
+	~	dollar
+	~		|
+
+Total conservation funds= INTEG (
+	annual funds-Annual funds out,
+		annual funds)
+	~	dollar
+	~	*TIME STEP
+	|
+
+Targeting NT[land type]=
+	0.02884,
+	0.04811,
+	0.08486,
+	0.15459,
+	0.6836
+	~	Dmnl
+	~	base line
+		0.02884,
+		0.04811,
+		0.08486,
+		0.15459,
+		0.68360
+		
+		targeting 1
+		0.17820,
+		0.29734,
+		0.52446,
+		0.00000,
+		0.00000
+		
+		Targeting 2
+		0.00000,
+		0.00000,
+		0.09194,
+		0.16748,
+		0.74058
+	|
+
+summed total erosion rate=
+	sum(Total Erosion[land type!])/sum(total area[land type!])
+	~	Mg/(Year*ha)
+	~		|
+
+Funds to CRP percent=
+	0.95
+	~	1/Year [0,1,0.025]
+	~	base line
+		0.95 
+		
+		Targeting 3 
+		caluated cost to fund all CLT 1 and 2 805.05 ha at $125/ha / $250,000/year
+		0.402525
+	|
+
+delta erosion=
+	sum(total Erosion last time step[land type!])-sum(Total Erosion[land type!])
+	~	Mg/Year
+	~		|
+
+total Erosion last time step[land type]=
+	DELAY1(Total Erosion[land type], 1 )
+	~	Mg/Year
+	~		|
+
+Targeting CRP[land type]=
+	0.02884,
+	0.04811,
+	0.08486,
+	0.15459,
+	0.6836
+	~	Dmnl
+	~	gaming perameter.
+		
+		base line
+		0.02884,
+		0.04811,
+		0.08486,
+		0.15459,
+		0.68360
+		
+		targeting 1
+		0.17820,
+		0.29734,
+		0.52446,
+		0.00000,
+		0.00000
+		
+		Targeting 2
+		0.37473,
+		0.62527,
+		0.00000,
+		0.00000,
+		0.00000
+	|
+
+CRP payment=
+	125
+	~	dollar/ha [0,?]
+	~	or 50 dollars per acre. personal comm. Boylan 2017 - cost share varies by \
+		current grant and funding agency regionally. These funding peramteres \
+		should be gaming variables.
+	|
+
+Erosion Rate CRP[land type]=
+	0.165083,
+	0.0585385,
+	0.0143143,
+	0.002128,
+	0.00103758
+	~	t/(ha*Year)
+	~	From Fowler MS thesis - summary of Thorn creek WEPP watershed analysis
+	|
+
+erosion CRP[land type]=
+	CRP area[land type]*Erosion Rate CRP[land type]
+	~	Mg/Year
+	~	calcualted
+	|
+
+Erosion CT[land type]=
+	CT farmed area[land type]*Erosion Rate CT[land type]
+	~	Mg/Year
+	~	calcualted
+	|
+
+Erosion MT[land type]=
+	MT farmed area[land type]*Erosion Rate MT[land type]
+	~	Mg/Year
+	~		|
+
+Erosion NT[land type]=
+	NT farmed area[land type]*Erosion Rate NT[land type]
+	~	Mg/Year
+	~	calcualted
+	|
+
+Erosion Rate CT[land type]=
+	25.362,
+	15.6149,
+	8.79606,
+	4.86394,
+	0.775132
+	~	t/(ha*Year)
+	~	From Fowler MS thesis - summary of Thorn creek WEPP watershed analysis
+	|
+
+Erosion Rate MT[land type]=
+	7.68433,
+	3.78772,
+	1.58097,
+	0.507688,
+	0.0489551
+	~	t/ha/Year
+	~	From Fowler MS thesis - summary of Thorn creek WEPP watershed analysis
+	|
+
+Erosion Rate NT[land type]=
+	2.9815,
+	1.18241,
+	0.461243,
+	0.127912,
+	0.0143152
+	~	t/ha/Year
+	~	From Fowler MS thesis - summary of Thorn creek WEPP watershed analysis
+	|
+
+NT payment=
+	75
+	~	dollar/ha
+	~	from Conservation planners - simplified constant rate. could be improved
+	|
+
+Total Erosion[land type]=
+	erosion CRP[land type]+Erosion CT[land type]+Erosion MT[land type]+Erosion NT[land type\
+		]
+	~	Mg/Year
+	~		|
+
+total area[land type]=
+	301.68,
+	503.37,
+	887.85,
+	1617.39,
+	7151.94
+	~	ha
+	~		|
+
+total erosion rate[land type]=
+	Total Erosion[land type]/total area[land type]
+	~	Mg/(Year*ha)
+	~		|
+
+land type:
+	hc1,hc2,hc3,hc4,hc5
+	~	
+	~		|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 2025
+	~	Year
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 1975
+	~	Year
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP
+	~	Year [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 0.03125
+	~	Year [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,60,0
+10,1,NT farmed area,1676,817,182,284,3,131,0,8,0,0,0,0,-1--1--1,0-0-0,|14||0-0-0
+10,2,MT farmed area,1027,686,145,144,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,3,CT farmed area,875,235,205,135,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,4,CRP area,210,780,115,275,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,5,7,2,4,0,0,22,0,0,0,-1--1--1,,1|(977,488)|
+1,6,7,3,100,0,0,22,0,0,0,-1--1--1,,1|(977,394)|
+11,7,508,977,426,6,8,34,131,0,0,1,0,0,0
+10,8,CT to MT,977,445,40,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,9,11,1,4,0,0,22,0,0,0,-1--1--1,,1|(1452,642)|
+1,10,11,2,100,0,0,22,0,0,0,-1--1--1,,1|(1283,642)|
+11,11,1644,1402,642,8,7,34,131,0,0,1,0,0,0
+10,12,MT to NT,1402,660,41,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,13,15,3,4,0,0,22,0,0,0,-1--1--1,,1|(892,417)|
+1,14,15,2,100,0,0,22,0,0,0,-1--1--1,,1|(892,511)|
+11,15,1436,892,473,6,8,34,3,0,0,1,0,0,0
+10,16,MT to CT,892,492,40,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,17,19,4,4,0,0,22,0,0,0,-1--1--1,,1|(280,368)|
+1,18,19,3,100,0,0,22,0,0,0,-1--1--1,,1|(478,223)|
+11,19,1580,280,223,6,8,34,3,0,0,1,0,0,0
+10,20,CT to CRP,280,242,44,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,21,23,3,4,0,0,22,0,0,0,-1--1--1,,1|(678,462)|
+1,22,23,4,100,0,0,22,0,0,0,-1--1--1,,1|(498,563)|
+11,23,1468,678,563,6,8,34,3,0,0,1,0,0,0
+10,24,CRP to CT,678,582,44,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,25,27,2,4,0,0,22,0,0,0,-1--1--1,,1|(828,759)|
+1,26,27,4,100,0,0,22,0,0,0,-1--1--1,,1|(543,759)|
+11,27,1132,768,759,6,8,34,3,0,0,1,0,0,0
+10,28,CRP to MT,768,778,46,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,29,31,1,4,0,0,22,0,0,0,-1--1--1,,1|(1717,335)|
+1,30,31,3,100,0,0,22,0,0,0,-1--1--1,,1|(1395,129)|
+11,31,1180,1717,129,6,8,34,3,0,0,1,0,0,0
+10,32,CT to Nt,1717,148,35,11,40,131,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,33,NT payment,2804,1215,48,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,34,3,8,1,0,0,0,0,128,0,-1--1--1,,1|(1023,392)|
+10,35,Total conservation funds,2372,809,106,47,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+12,36,48,1911,813,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,37,39,35,4,0,0,22,0,0,0,-1--1--1,,1|(2165,815)|
+1,38,39,36,100,0,0,22,0,0,0,-1--1--1,,1|(1984,815)|
+11,39,48,2056,815,8,6,33,131,0,0,4,0,0,0
+10,40,annual funds,2112,815,48,11,40,3,0,8,1,0,0,0,-1--1--1,0-0-0,|14||0-0-0
+10,41,CRP funds,2297,1119,49,28,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,42,2,16,1,0,0,0,0,128,0,-1--1--1,,1|(866,585)|
+10,43,total area,236,1428,35,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,44,3,185,1,0,43,0,11,128,0,0-128-0,|14||0-0-0,1|(632,381)|
+1,45,2,194,0,0,0,0,0,128,0,-1--1--1,,1|(864,803)|
+10,46,CRP payment,2475,1202,53,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,47,Erosion Rate NT,984,1254,49,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,48,Erosion Rate MT,724,1220,49,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,49,Erosion Rate CT,429,1232,49,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,50,Erosion Rate CRP,179,1318,49,20,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,51,erosion CRP,282,1259,48,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,52,Erosion CT,506,1302,44,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,53,Erosion MT,728,1288,46,11,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,54,Erosion NT,1008,1317,45,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,55,50,51,0,0,0,0,0,128,0,-1--1--1,,1|(231,1287)|
+1,56,49,52,0,0,0,0,0,128,0,-1--1--1,,1|(466,1266)|
+1,57,48,53,1,0,0,0,0,128,0,-1--1--1,,1|(729,1270)|
+1,58,47,54,0,0,0,0,0,128,0,-1--1--1,,1|(994,1283)|
+10,59,Total Erosion,590,1389,51,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,60,51,59,1,0,0,0,0,128,0,-1--1--1,,1|(415,1369)|
+1,61,52,59,0,0,0,0,0,128,0,-1--1--1,,1|(542,1340)|
+1,62,53,59,1,0,0,0,0,128,0,-1--1--1,,1|(687,1321)|
+1,63,54,59,1,0,0,0,0,128,0,-1--1--1,,1|(859,1356)|
+10,64,total erosion rate,401,1466,47,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,65,43,64,1,0,0,0,0,128,0,-1--1--1,,1|(332,1455)|
+1,66,59,64,0,0,0,0,0,128,0,-1--1--1,,1|(511,1420)|
+10,67,Targeting CRP,2444,1125,56,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,68,total Erosion last time step,591,1523,64,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,69,delta erosion,811,1469,48,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,70,59,68,0,0,0,0,0,128,0,-1--1--1,,1|(590,1444)|
+1,71,59,69,0,0,0,0,0,128,0,-1--1--1,,1|(693,1426)|
+1,72,68,69,0,0,0,0,0,128,0,-1--1--1,,1|(703,1495)|
+10,73,summed total erosion rate,416,1542,52,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,74,erosion reduction per conservation funds,2045,1249,85,35,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,75,40,74,1,0,0,0,0,128,0,-1--1--1,,1|(2026,1128)|
+1,76,69,74,0,0,0,0,0,128,0,-1--1--1,,1|(1402,1363)|
+1,77,79,4,4,0,0,22,0,0,0,-1--1--1,,1|(548,697)|
+1,78,79,2,100,0,0,22,0,0,0,-1--1--1,,1|(833,697)|
+11,79,588,778,697,6,8,34,3,0,0,1,0,0,0
+10,80,MT to CRP,778,716,46,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,81,2,79,1,0,0,0,0,128,0,-1--1--1,,1|(834,648)|
+1,82,83,41,100,0,0,22,0,0,0,-1--1--1,,1|(2287,1172)|
+11,83,1484,2287,1203,8,6,33,3,0,0,4,0,0,0
+10,84,CRP funding,2344,1203,49,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+12,85,48,2589,1291,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,86,87,85,4,0,0,22,0,0,0,-1--1--1,,1|(2587,1247)|
+11,87,48,2587,1205,8,6,33,3,0,0,4,0,0,0
+10,88,NT funding,2639,1205,44,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,89,43,4,0,0,0,0,0,64,1,-1--1--1,,1|(228,1242)|
+1,90,59,73,0,0,0,0,0,128,0,-1--1--1,,1|(513,1456)|
+12,91,48,2857,822,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,92,94,91,4,0,0,22,0,0,0,-1--1--1,,1|(2759,824)|
+1,93,94,35,100,0,0,22,0,0,0,-1--1--1,,1|(2569,824)|
+11,94,48,2666,824,6,8,34,3,0,0,1,0,0,0
+10,95,Annual funds out,2666,852,51,20,40,131,0,8,-1,0,0,0,-1--1--1,0-0-0,|14||0-0-0
+10,96,Funds to CRP percent,2231,915,50,24,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,97,2,12,0,0,0,0,0,64,0,-1--1--1,,1|(1259,669)|
+1,98,43,73,1,0,0,0,0,64,0,-1--1--1,,1|(293,1481)|
+10,99,total area,2648,717,45,11,8,2,1,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,100,Targeting NT,2720,1132,51,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+12,101,48,2302,974,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,102,104,41,4,0,0,22,0,0,0,-1--1--1,,1|(2303,1067)|
+1,103,104,101,100,0,0,22,0,0,0,-1--1--1,,1|(2303,1007)|
+11,104,48,2303,1038,8,6,33,3,0,0,4,0,0,0
+10,105,To CRP,2344,1038,33,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,106,67,105,0,0,0,0,0,64,0,-1--1--1,,1|(2399,1086)|
+11,107,1404,2591,1046,1,1,2,131,0,0,1,0,0,0
+12,108,48,2592,979,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,109,110,108,100,0,0,22,0,0,0,-1--1--1,,1|(2587,1010)|
+11,110,48,2587,1040,8,6,33,3,0,0,4,0,0,0
+10,111,To NT,2623,1040,28,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,112,100,111,0,0,0,0,0,64,0,-1--1--1,,1|(2676,1090)|
+1,113,115,1,4,0,0,22,0,0,0,-1--1--1,,1|(1244,1014)|
+1,114,115,4,100,0,0,22,0,0,0,-1--1--1,,1|(653,1014)|
+11,115,1324,988,1014,6,8,34,3,0,0,1,0,0,0
+10,116,CRP to NT,988,1033,44,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,117,119,4,4,0,0,22,0,0,0,-1--1--1,,1|(654,937)|
+1,118,119,1,100,0,0,22,0,0,0,-1--1--1,,1|(1244,937)|
+11,119,1212,989,937,6,8,34,3,0,0,1,0,0,0
+10,120,NT to CRP,989,956,44,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,121,1,202,1,0,0,0,0,128,0,-1--1--1,,1|(1196,983)|
+1,122,1,120,1,0,0,0,0,128,0,-1--1--1,,1|(1270,898)|
+10,123,total area,1338,328,45,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,124,CRP funds,-457,295,52,11,8,2,1,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,125,funds spent,-825,218,44,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,126,CT to CRP,-958,88,54,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,127,MT to CRP,-850,78,56,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,128,NT to CRP,-835,143,54,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,129,CT to MT,-705,98,50,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,130,CT to Nt,-705,138,45,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,131,MT to NT,-715,163,51,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,132,CRP to NT,-725,193,54,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,133,CRP payment,-990,293,39,20,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,134,NT payment,-815,318,58,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,135,133,125,0,0,0,0,0,128,0,-1--1--1,,1|(-906,255)|
+1,136,134,125,0,0,0,0,0,128,0,-1--1--1,,1|(-818,274)|
+1,137,128,125,0,0,0,0,0,128,0,-1--1--1,,1|(-831,173)|
+1,138,127,125,1,0,0,0,0,128,0,-1--1--1,,1|(-908,120)|
+1,139,126,125,1,0,0,0,0,128,0,-1--1--1,,1|(-955,165)|
+1,140,132,125,1,0,0,0,0,128,0,-1--1--1,,1|(-743,230)|
+1,141,131,125,1,0,0,0,0,128,0,-1--1--1,,1|(-793,175)|
+10,142,CT to Nt,-695,268,45,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,143,142,125,0,0,0,0,0,128,0,-1--1--1,,1|(-752,245)|
+10,144,test summed,-818,413,48,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,145,125,144,1,0,0,0,0,128,0,-1--1--1,,1|(-903,363)|
+10,146,CRP word of mouth,147,129,52,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,147,total area,-122,260,45,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,148,147,146,0,0,0,0,0,128,0,-1--1--1,,1|(-4,202)|
+10,149,CRP word of mounth efficiency,140,39,69,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,150,149,146,0,0,0,0,0,128,0,-1--1--1,,1|(142,77)|
+1,151,4,146,1,0,43,0,11,128,0,0-128-0,|14||0-0-0,1|(-154,200)|
+1,152,146,279,1,0,43,0,11,128,0,128-0-128,|14||0-0-0,1|(226,159)|
+10,153,CRP fund effectiveness,44,331,49,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,154,CRP contract length,2463,1329,52,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,155,NT contract length,2837,1277,47,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,156,MT funds,2995,1126,45,28,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+12,157,48,2993,970,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,158,160,156,4,0,0,22,0,0,0,-1--1--1,,1|(2992,1073)|
+1,159,160,157,100,0,0,22,0,0,0,-1--1--1,,1|(2992,1007)|
+11,160,48,2992,1043,8,6,33,3,0,0,4,0,0,0
+10,161,To MT,3029,1043,29,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+12,162,48,2991,1315,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,163,165,162,4,0,0,22,0,0,0,-1--1--1,,1|(2991,1259)|
+1,164,165,156,100,0,0,22,0,0,0,-1--1--1,,1|(2991,1176)|
+11,165,48,2991,1205,8,6,33,3,0,0,4,0,0,0
+10,166,MT funding,3045,1205,46,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,167,Targeting MT,3119,1116,53,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,168,167,161,0,0,0,0,0,128,0,-1--1--1,,1|(3079,1083)|
+1,169,156,165,1,0,0,0,0,128,0,-1--1--1,,1|(3009,1154)|
+10,170,MT payment,3110,1261,50,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,171,MT contract length,3171,1309,48,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,172,MT acres funded,3147,1393,37,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,173,170,172,1,0,0,0,0,128,0,-1--1--1,,1|(3066,1312)|
+1,174,171,172,1,0,0,0,0,128,0,-1--1--1,,1|(3116,1339)|
+1,175,156,172,1,0,0,0,0,128,0,-1--1--1,,1|(2949,1303)|
+10,176,CRP payment,-392,283,39,20,8,2,1,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,177,nonCRP area,-58,418,51,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,178,4,177,1,0,45,0,11,128,0,0-128-0,|14||0-0-0,1|(-27,500)|
+1,179,177,153,1,0,45,0,11,128,0,0-128-0,|14||0-0-0,1|(7,375)|
+1,180,147,177,1,0,0,0,0,128,0,-1--1--1,,1|(-105,352)|
+10,181,CRP contract length,518,594,57,20,8,130,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,182,177,185,1,0,45,0,11,128,0,128-0-128,|14||0-0-0,1|(370,416)|
+10,183,CRP ended contract due to completion,526,659,77,20,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,184,181,183,0,0,0,0,0,128,0,-1--1--1,,1|(520,619)|
+10,185,nonCRP CT Ratio,425,406,48,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,186,183,24,0,0,43,0,11,128,0,128-0-128,|14||0-0-0,1|(604,619)|
+1,187,185,24,0,0,43,0,11,128,0,64-160-98,|14||0-0-0,1|(551,494)|
+1,188,153,278,1,0,43,0,11,128,0,128-0-128,|14||0-0-0,1|(114,340)|
+10,189,CRP word of mouth,682,653,57,20,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,190,CRP fund effectiveness,794,626,55,20,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,191,189,79,1,0,0,0,0,128,0,-1--1--1,,1|(761,668)|
+1,192,190,79,0,0,0,0,0,128,0,-1--1--1,,1|(786,661)|
+1,193,183,27,1,0,0,0,0,128,0,-1--1--1,,1|(592,713)|
+10,194,nonCRP MT Ratio,809,845,50,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,195,nonCRP area,741,899,39,20,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,196,195,194,1,0,0,0,0,128,0,-1--1--1,,1|(786,856)|
+1,197,194,27,1,0,0,0,0,128,0,-1--1--1,,1|(774,830)|
+10,198,CRP word of mouth,935,873,57,20,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,199,CRP fund effectiveness,1070,868,55,20,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,200,198,119,1,0,0,0,0,128,0,-1--1--1,,1|(954,910)|
+1,201,199,120,0,0,0,0,0,128,0,-1--1--1,,1|(1030,911)|
+10,202,nonCRP NT ratio,841,978,49,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,203,195,202,1,0,0,0,0,128,0,-1--1--1,,1|(784,934)|
+1,204,202,116,1,0,0,0,0,128,0,-1--1--1,,1|(862,1004)|
+10,205,CRP ended contract due to completion,852,1062,82,20,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,206,205,116,1,0,0,0,0,128,0,-1--1--1,,1|(923,1061)|
+10,207,CRP area,304,1201,47,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,208,CT farmed area,587,1228,48,20,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,209,MT farmed area,833,1222,50,20,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,210,NT farmed area,1162,1249,58,28,8,130,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,211,210,54,0,0,0,0,0,128,0,-1--1--1,,1|(1074,1287)|
+1,212,209,53,1,0,0,0,0,128,0,-1--1--1,,1|(761,1275)|
+1,213,208,52,0,0,0,0,0,128,0,-1--1--1,,1|(547,1264)|
+1,214,207,51,0,0,0,0,0,128,0,-1--1--1,,1|(295,1223)|
+1,215,217,2,4,0,0,22,0,0,0,-1--1--1,,1|(1248,782)|
+1,216,217,1,100,0,0,22,0,0,0,-1--1--1,,1|(1415,782)|
+11,217,316,1330,782,6,8,34,3,0,0,1,0,0,0
+10,218,NT to MT,1330,801,41,11,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,219,221,3,4,0,0,22,0,0,0,-1--1--1,,1|(1240,245)|
+1,220,221,1,100,0,0,22,0,0,0,-1--1--1,,1|(1676,245)|
+11,221,1372,1406,245,6,8,34,3,0,0,1,0,0,0
+10,222,NT to CT,1406,264,39,11,40,131,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,223,total area,1879,107,45,11,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,224,nonNT area,1956,191,46,11,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,225,223,224,0,0,0,0,0,128,0,-1--1--1,,1|(1912,143)|
+1,226,1,224,1,0,0,0,0,128,0,-1--1--1,,1|(2027,455)|
+10,227,NT CT word of mouth,1791,4,61,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,228,NT CT word of mouth effectiveness,1738,-72,82,31,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,229,1,227,1,0,0,0,0,128,0,-1--1--1,,1|(2000,148)|
+1,230,228,227,0,0,0,0,0,128,0,-1--1--1,,1|(1763,-35)|
+1,231,223,227,0,0,0,0,0,128,0,-1--1--1,,1|(1843,65)|
+10,232,NT CT fund effectiveness,1896,282,80,20,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,233,224,232,0,0,0,0,0,128,0,-1--1--1,,1|(1932,226)|
+10,234,MT word of mounth effectiveness,1167,293,69,20,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,235,MT word of mouth,1172,364,48,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,236,123,235,1,0,0,0,0,128,0,-1--1--1,,1|(1249,335)|
+1,237,234,235,0,0,0,0,0,128,0,-1--1--1,,1|(1168,321)|
+1,238,2,235,1,0,0,0,0,128,0,-1--1--1,,1|(1136,468)|
+10,239,nonMT area,1429,453,43,26,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,240,MT acres funded,1310,385,43,20,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,241,2,239,1,0,0,0,0,128,0,-1--1--1,,1|(1366,499)|
+1,242,123,239,1,0,0,0,0,128,0,-1--1--1,,1|(1427,423)|
+10,243,MT CT fund effectiveness,1255,458,60,26,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,244,240,243,1,0,0,0,0,128,0,-1--1--1,,1|(1287,433)|
+1,245,239,243,1,0,0,0,0,128,0,-1--1--1,,1|(1348,453)|
+1,246,235,8,1,0,0,0,0,128,0,-1--1--1,,1|(1034,413)|
+1,247,243,8,0,0,0,0,0,128,0,-1--1--1,,1|(1112,451)|
+1,248,1,221,1,0,0,0,0,128,0,-1--1--1,,1|(1630,328)|
+10,249,NT out coefficient,1505,208,40,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,250,249,221,1,0,0,0,0,128,0,-1--1--1,,1|(1421,225)|
+10,251,MT out Coefficient,789,455,42,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,252,251,16,1,0,0,0,0,128,0,-1--1--1,,1|(817,513)|
+1,253,232,11,1,0,0,0,0,128,0,-1--1--1,,1|(1412,640)|
+1,254,235,218,1,0,0,0,0,128,0,-1--1--1,,1|(1239,738)|
+1,255,1,217,1,0,0,0,0,128,0,-1--1--1,,1|(1365,741)|
+1,256,43,3,0,0,0,0,0,64,1,-1--1--1,,1|(518,900)|
+1,257,43,1,0,0,0,0,0,64,1,-1--1--1,,1|(871,1158)|
+10,258,NT funds,2591,1123,45,27,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,259,110,258,4,0,0,22,0,0,0,-1--1--1,,1|(2587,1071)|
+1,260,87,258,100,0,0,22,0,0,0,-1--1--1,,1|(2587,1174)|
+1,261,258,88,1,0,0,0,0,64,0,-1--1--1,,1|(2654,1149)|
+1,262,43,2,0,0,0,0,0,64,1,-1--1--1,,1|(559,1124)|
+1,263,3,278,1,0,43,0,11,128,0,128-0-128,|14||0-0-0,1|(459,271)|
+1,264,3,279,1,0,43,0,11,128,0,128-0-128,|14||0-0-0,1|(346,123)|
+10,265,CRP ended contracts due to price,516,834,61,30,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,266,4,265,0,0,43,0,11,128,0,128-0-128,|14||0-0-0,1|(383,810)|
+1,267,265,24,1,0,43,0,11,128,0,128-0-128,|14||0-0-0,1|(644,676)|
+10,268,CRP ended contracts due to price,985,1121,84,33,8,130,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,269,265,28,1,0,0,0,0,128,0,-1--1--1,,1|(693,816)|
+1,270,268,116,0,0,0,0,0,128,0,-1--1--1,,1|(986,1072)|
+12,271,0,460,165,20,20,5,7,0,9,-1,0,0,0,128-0-128,0-0-0,|14||0-0-0
+ --
+12,272,0,-124,543,20,20,4,7,0,9,-1,0,0,0,0-128-0,0-0-0,|14||0-0-0
++
+12,273,0,140,426,20,20,4,7,0,9,-1,0,0,0,0-128-0,0-0-0,|14||0-0-0
++
+12,274,0,192,225,20,20,5,7,0,9,-1,0,0,0,128-0-128,0-0-0,|14||0-0-0
+ --
+12,275,0,609,442,20,20,5,7,0,9,-1,0,0,0,64-160-98,0-0-0,|14||0-0-0
++
+12,276,0,412,497,20,20,4,7,0,9,-1,0,0,0,128-0-128,0-0-0,|14||0-0-0
+ --
+12,277,0,479,731,20,20,5,7,0,9,-1,0,0,0,128-0-128,0-0-0,|14||0-0-0
+ --
+10,278,CRP CT fund effectiveness,181,297,54,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,279,CRP CT word of mouth,291,163,56,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,280,279,19,0,0,0,0,0,128,0,-1--1--1,,1|(285,193)|
+1,281,278,20,0,0,0,0,0,128,0,-1--1--1,,1|(232,268)|
+1,282,227,31,0,0,0,0,0,128,0,-1--1--1,,1|(1753,67)|
+10,283,Funds to conservation tillage,2794,914,60,19,8,3,0,0,0,0,0,0
+1,284,283,111,1,0,0,0,0,128,0,-1--1--1,,1|(2697,967)|
+1,285,283,161,1,0,0,0,0,128,0,-1--1--1,,1|(2945,959)|
+10,286,NT payment ratio,2879,1092,56,11,8,3,0,0,0,0,0,0
+1,287,33,286,1,0,0,0,0,128,0,-1--1--1,,1|(2850,1163)|
+1,288,170,286,1,0,0,0,0,128,0,-1--1--1,,1|(2899,1228)|
+1,289,286,111,1,0,0,0,0,128,0,-1--1--1,,1|(2770,1053)|
+1,290,286,161,1,0,0,0,0,128,0,-1--1--1,,1|(2917,1067)|
+1,291,283,95,0,0,0,0,0,128,0,-1--1--1,,1|(2737,886)|
+10,292,NT MT word of mouth efficiency,1593,367,53,19,8,3,0,0,0,0,0,0
+10,293,NT MT word of mouth,1525,492,53,19,8,3,0,0,0,0,0,0
+1,294,292,293,0,0,0,0,0,128,0,-1--1--1,,1|(1562,423)|
+1,295,1,293,1,0,0,0,0,128,0,-1--1--1,,1|(1614,531)|
+1,296,293,11,1,0,0,0,0,128,0,-1--1--1,,1|(1451,561)|
+10,297,Funds to CRP,2359,915,37,19,8,3,0,0,0,0,0,0
+1,298,35,297,0,0,0,0,0,128,0,-1--1--1,,1|(2365,869)|
+1,299,96,297,0,0,0,0,0,128,0,-1--1--1,,1|(2294,915)|
+1,300,297,105,0,0,0,0,0,128,0,-1--1--1,,1|(2351,973)|
+1,301,297,95,1,0,0,0,0,128,0,-1--1--1,,1|(2501,910)|
+1,302,297,283,1,0,0,0,0,128,0,-1--1--1,,1|(2480,965)|
+1,303,35,283,1,0,0,0,0,128,0,-1--1--1,,1|(2659,924)|
+1,304,123,293,1,0,0,0,0,128,0,-1--1--1,,1|(1475,409)|
+1,305,41,84,1,0,0,0,0,128,0,-1--1--1,,1|(2371,1138)|
+10,306,test,2303,1279,40,20,3,3,0,0,0,0,0,0
+1,307,83,306,4,0,0,22,0,0,0,-1--1--1,,1|(2287,1234)|
+10,308,CRP acres funded,2320,1331,58,11,8,3,0,0,0,0,0,0
+1,309,41,308,1,0,0,0,0,128,0,-1--1--1,,1|(2193,1244)|
+1,310,46,308,1,0,0,0,0,128,0,-1--1--1,,1|(2376,1266)|
+1,311,154,308,1,0,0,0,0,128,0,-1--1--1,,1|(2349,1384)|
+10,312,NT acres funded,2737,1318,53,11,8,3,0,0,0,0,0,0
+1,313,88,312,1,0,0,0,0,128,0,-1--1--1,,1|(2692,1278)|
+1,314,33,312,1,0,0,0,0,128,0,-1--1--1,,1|(2755,1278)|
+1,315,155,312,0,0,0,0,0,128,0,-1--1--1,,1|(2782,1298)|
+10,316,CRP acres funded,10,269,40,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,317,316,153,0,0,0,0,0,128,0,-1--1--1,,1|(23,293)|
+10,318,NT acres funded,1893,369,35,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,319,318,232,0,0,0,0,0,128,0,-1--1--1,,1|(1893,332)|
+10,320,funds,2057,762,18,11,8,3,0,0,0,0,0,0
+1,321,320,40,0,0,0,0,0,128,0,-1--1--1,,1|(2078,783)|
+10,322,CRP area,-264,1440,41,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,323,NT farmed area,-257,1495,60,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,324,MT farmed area,-272,1542,42,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,325,CT farmed area,-272,1604,59,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,326,CRP Percent,-22,1439,42,11,8,3,0,0,0,0,0,0
+10,327,NT percent,-26,1484,37,11,8,3,0,0,0,0,0,0
+10,328,MT percent,-37,1560,38,11,8,3,0,0,0,0,0,0
+10,329,CT percent,-56,1614,37,11,8,3,0,0,0,0,0,0
+1,330,322,326,0,0,0,0,0,128,0,-1--1--1,,1|(-151,1439)|
+1,331,323,327,0,0,0,0,0,128,0,-1--1--1,,1|(-138,1489)|
+1,332,324,328,0,0,0,0,0,128,0,-1--1--1,,1|(-160,1550)|
+1,333,325,329,0,0,0,0,0,128,0,-1--1--1,,1|(-160,1608)|
+1,334,43,326,0,0,0,0,0,128,0,-1--1--1,,1|(117,1432)|
+1,335,43,327,0,0,0,0,0,128,0,-1--1--1,,1|(112,1454)|
+1,336,43,328,0,0,0,0,0,128,0,-1--1--1,,1|(105,1490)|
+1,337,43,329,1,0,0,0,0,128,0,-1--1--1,,1|(87,1565)|
+10,338,nt percent data,-87,1713,42,19,8,3,0,0,0,0,0,0
+10,339,mt data percent,-92,1778,49,11,8,3,0,0,0,0,0,0
+10,340,ct data percent,-98,1817,47,11,8,3,0,0,0,0,0,0
+10,341,CRP data percent,-104,1865,57,11,8,3,0,0,0,0,0,0
+10,342,CRP withman funding,77,1746,45,19,8,3,0,0,0,0,0,0
+10,343,CRP data switch,2123,927,53,11,8,3,1,0,0,0,0,0
+10,344,CRP withman funding,2179,970,49,19,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,345,Cnstant reduced tillage funding,2948,889,53,19,8,3,1,0,0,0,0,0
+10,346,Time,2320,1361,26,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,347,346,308,0,0,0,0,0,64,0,-1--1--1,,1|(2320,1353)|
+1,348,4,183,0,0,0,0,0,128,0,-1--1--1,,1|(392,710)|
+10,349,till funding switch,3134,989,57,11,8,3,1,0,0,0,0,0
+10,350,Time,2792,982,26,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,351,Time,2032,1273,26,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,352,3,32,0,0,0,0,0,64,0,-1--1--1,,1|(1374,183)|
+10,353,TIME STEP,2173,698,50,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,354,232,32,1,0,0,0,0,128,0,-1--1--1,,1|(1793,184)|
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 2
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,50,2
+12,1,6297514,936,504,185,183,3,188,0,0,1,0,0,0
+CRP
+12,2,2824140,1314,504,187,183,3,188,0,0,1,0,0,0
+CT
+12,3,5117884,1690,504,184,183,3,188,0,0,1,0,0,0
+MT
+12,4,6231914,2065,504,184,184,3,188,0,0,1,0,0,0
+NT
+12,5,21632070,295,499,80,20,3,124,0,0,0,0,0,0
+Targeting CRP[hc1],0,1,0.05
+12,6,6100812,297,562,80,20,3,124,0,0,0,0,0,0
+Targeting CRP[hc2],0,1,0.05
+12,7,5969778,296,628,80,20,3,124,0,0,0,0,0,0
+Targeting CRP[hc3],0,1,0.05
+12,8,6362952,296,691,80,20,3,124,0,0,0,0,0,0
+Targeting CRP[hc4],0,1,0.05
+12,9,7737496,296,747,80,20,3,124,0,0,0,0,0,0
+Targeting CRP[hc5],0,1,0.05
+12,10,4986754,990,880,239,186,3,188,0,0,1,0,0,0
+Total_erosion_rate
+12,11,6756290,479,828,80,20,3,124,0,0,0,0,0,0
+Funds to CRP percent,0,1,0.05
+12,12,0,100,993,80,20,3,124,1,0,0,0,0,0
+NT MT word of mouth efficiency,0,1,0.05
+12,13,12520150,1993,881,254,185,3,188,0,0,1,0,0,0
+Erosion_per_dollar
+12,14,5638926,473,498,80,20,3,124,0,0,0,0,0,0
+Targeting NT[hc1],0,1,0.05
+12,15,6166414,473,563,80,20,3,124,0,0,0,0,0,0
+Targeting NT[hc2],0,1,0.05
+12,16,9574158,476,628,80,20,3,124,0,0,0,0,0,0
+Targeting NT[hc3],0,1,0.05
+12,17,7018386,477,690,80,20,3,124,0,0,0,0,0,0
+Targeting NT[hc4],0,1,0.05
+12,18,6100782,478,747,80,20,3,124,0,0,0,0,0,0
+Targeting NT[hc5],0,1,0.05
+12,19,13112778,471,354,80,20,3,124,0,0,0,0,0,0
+funds,0,1e+006,10000
+12,20,6231862,480,898,80,20,3,124,0,0,0,0,0,0
+,0,1,1
+12,21,10227402,297,430,80,20,3,124,0,0,0,0,0,0
+CRP payment,0,200,10
+12,22,11801532,474,429,80,20,3,124,0,0,0,0,0,0
+NT payment,0,400,10
+12,23,12130052,648,429,80,20,3,124,0,0,0,0,0,0
+MT payment,0,400,10
+12,24,6428602,648,500,80,20,3,124,0,0,0,0,0,0
+Targeting MT[hc1],0,1,0.01
+12,25,11602678,648,563,80,20,3,124,0,0,0,0,0,0
+Targeting MT[hc2],0,1,0.01
+12,26,10818754,649,628,80,20,3,124,0,0,0,0,0,0
+Targeting MT[hc3],0,1,0.02
+12,27,6297442,649,687,80,20,3,124,0,0,0,0,0,0
+Targeting MT[hc4],0,1,0.02
+12,28,17307150,651,747,80,20,3,124,0,0,0,0,0,0
+Targeting MT[hc5],0,1,0.02
+12,29,13375224,1485,881,245,185,3,188,0,0,1,0,0,0
+total_erosion_single
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*Price structure
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,65,2
+10,1,Time,270,242,26,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*Conservation funding structure 
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,65,0
+32,1,20.07.15_model0000.met,657,370,579,292,8,0,0,0,-1,0,0,0
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*Erosion rates
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,35,0
+10,1,total area,-135,707,51,16,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,2,Erosion Rate NT,628,237,71,29,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,3,Erosion Rate MT,487,147,71,29,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,4,Erosion Rate CT,166,166,71,29,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,5,Erosion Rate CRP,-100,267,71,29,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,6,erosion CRP,-50,382,70,14,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,7,Erosion CT,103,286,64,14,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,8,Erosion MT,383,275,67,14,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,9,Erosion NT,590,403,65,14,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+1,10,5,6,0,0,0,0,0,128,0,-1--1--1,,1|(-74,325)|
+1,11,4,7,0,0,0,0,0,128,0,-1--1--1,,1|(133,227)|
+1,12,3,8,1,0,0,0,0,128,0,-1--1--1,,1|(433,213)|
+1,13,2,9,0,0,0,0,0,128,0,-1--1--1,,1|(609,320)|
+10,14,Total Erosion,291,552,74,14,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+1,15,6,14,1,0,0,0,0,128,0,-1--1--1,,1|(113,463)|
+1,16,7,14,0,0,0,0,0,128,0,-1--1--1,,1|(192,413)|
+1,17,8,14,1,0,0,0,0,128,0,-1--1--1,,1|(339,406)|
+1,18,9,14,1,0,0,0,0,128,0,-1--1--1,,1|(446,474)|
+10,19,total erosion rate,41,809,68,29,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+1,20,1,19,1,0,0,0,0,128,0,-1--1--1,,1|(-64,748)|
+1,21,14,19,0,0,0,0,0,128,0,-1--1--1,,1|(178,667)|
+10,22,total Erosion last time step,401,825,92,29,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,23,delta erosion,480,679,70,14,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+1,24,14,22,0,0,0,0,0,128,0,-1--1--1,,1|(339,674)|
+1,25,14,23,0,0,0,0,0,128,0,-1--1--1,,1|(379,611)|
+1,26,22,23,0,0,0,0,0,128,0,-1--1--1,,1|(440,750)|
+10,27,summed total erosion rate,-78,559,74,29,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,28,erosion reduction per conservation funds,740,804,103,29,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+1,29,23,28,0,0,0,0,0,128,0,-1--1--1,,1|(587,730)|
+1,30,14,27,0,0,0,0,0,128,0,-1--1--1,,1|(113,554)|
+1,31,1,27,1,0,0,0,0,64,0,-1--1--1,,1|(-113,655)|
+10,32,CRP area,-227,316,41,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,33,32,6,0,0,0,0,0,64,0,-1--1--1,,1|(-149,345)|
+10,34,CT farmed area,36,178,59,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,35,34,7,0,0,0,0,0,64,0,-1--1--1,,1|(64,224)|
+10,36,MT farmed area,356,166,72,24,8,130,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,37,36,8,0,0,0,0,0,64,0,-1--1--1,,1|(368,218)|
+10,38,NT farmed area,752,299,57,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,39,38,9,0,0,0,0,0,64,0,-1--1--1,,1|(678,345)|
+10,40,annual funds,983,763,48,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,41,40,28,0,0,0,0,0,64,0,-1--1--1,,1|(895,777)|
+10,42,Funds to CRP percent,740,852,55,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,43,42,28,0,0,0,0,0,64,0,-1--1--1,,1|(740,844)|
+10,44,till funding switch,740,852,37,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,45,44,28,0,0,0,0,0,64,0,-1--1--1,,1|(740,833)|
+10,46,Time,740,852,26,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,47,46,28,0,0,0,0,0,64,0,-1--1--1,,1|(740,844)|
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*CT and NT 
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,50,0
+10,1,NT farmed area,698,701,69,48,3,131,0,0,0,0,0,0
+10,2,CT farmed area,204,426,69,41,3,131,0,0,0,0,0,0
+1,3,5,1,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(698,426)|
+1,4,5,2,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(389,426)|
+11,5,268,511,426,6,8,34,3,0,0,1,0,0,0
+10,6,CT to Nt,511,450,29,16,40,131,0,0,-1,0,0,0
+10,7,NT payment,941,897,40,11,8,3,0,0,0,0,0,0
+10,8,Total conservation funds,1120,510,57,47,3,131,0,0,0,0,0,0
+12,9,48,938,383,10,8,0,3,0,0,-1,0,0,0
+1,10,12,8,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(1016,502)|
+1,11,12,9,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(938,502)|
+11,12,48,962,502,8,6,33,131,0,0,4,0,0,0
+10,13,annual funds,1009,502,39,11,40,3,0,0,1,0,0,0
+10,14,Erosion Rate NT,483,843,54,11,8,3,0,0,0,0,0,0
+10,15,Erosion NT,467,906,38,11,8,3,0,0,0,0,0,0
+1,16,14,15,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(476,867)|
+10,17,Total Erosion,476,966,43,11,8,3,0,0,0,0,0,0
+1,18,15,17,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(475,938)|
+10,19,total Erosion last time step,477,1032,53,19,8,3,0,0,0,0,0,0
+10,20,delta erosion,604,967,41,11,8,3,0,0,0,0,0,0
+1,21,17,19,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(476,988)|
+1,22,17,20,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(534,966)|
+1,23,19,20,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(541,998)|
+10,24,erosion reduction per conservation funds,768,978,68,19,8,131,0,0,0,0,0,0
+1,25,13,24,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(952,729)|
+1,26,20,24,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(665,970)|
+12,27,48,1118,909,10,8,0,3,0,0,-1,0,0,0
+1,28,29,27,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(1116,865)|
+11,29,48,1116,823,8,6,33,3,0,0,4,0,0,0
+10,30,NT funding,1160,823,36,11,40,3,0,0,-1,0,0,0
+12,31,48,1371,500,10,8,0,3,0,0,-1,0,0,0
+1,32,34,31,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(1323,500)|
+1,33,34,8,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(1225,500)|
+11,34,48,1279,500,6,8,34,131,0,0,1,0,0,0
+10,35,Annual funds out,1279,519,53,11,40,131,0,0,-1,0,0,0
+10,36,total area,1477,396,39,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,37,Targeting NT,1249,750,43,11,8,3,0,0,0,0,0,0
+11,38,1340,1120,664,1,1,2,131,0,0,1,0,0,0
+12,39,48,1121,597,10,8,0,3,0,0,-1,0,0,0
+1,40,41,39,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(1116,628)|
+11,41,48,1116,658,8,6,33,3,0,0,4,0,0,0
+10,42,To NT,1147,658,23,11,40,3,0,0,-1,0,0,0
+1,43,37,42,0,0,0,0,1,64,0,0-0-0,|12||0-0-0,1|(1203,708)|
+10,44,NT contract length,1004,933,59,11,8,3,0,0,0,0,0,0
+10,45,NT farmed area,619,878,48,23,8,130,0,2,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,46,45,15,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(544,891)|
+1,47,49,2,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(209,583)|
+1,48,49,1,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(422,707)|
+11,49,316,209,707,6,8,34,3,0,0,1,0,0,0
+10,50,NT to CT,209,738,95,23,40,131,0,0,-1,0,0,0
+10,51,total area,840,367,39,11,8,2,0,2,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+10,52,nonNT area,780,455,39,11,8,3,0,0,0,0,0,0
+1,53,51,52,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(814,405)|
+1,54,1,52,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(742,566)|
+10,55,NT CT word of mouth,703,370,52,19,8,3,0,0,0,0,0,0
+10,56,NT CT word of mouth effectiveness,400,338,52,19,8,131,0,0,0,0,0,0
+1,57,1,55,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(724,436)|
+1,58,56,55,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(544,352)|
+1,59,51,55,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(784,367)|
+10,60,NT CT fund effectiveness,829,570,67,19,8,131,0,0,0,0,0,0
+1,61,52,60,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(799,502)|
+1,62,1,49,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(460,760)|
+10,63,NT out coefficient,306,661,67,25,8,131,0,0,0,0,0,0
+1,64,63,49,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(305,662)|
+10,65,NT funds,1120,741,45,27,3,131,0,0,0,0,0,0
+1,66,41,65,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(1116,689)|
+1,67,29,65,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(1116,792)|
+1,68,65,30,1,0,0,0,1,64,0,0-0-0,|12||0-0-0,1|(1183,767)|
+1,69,55,5,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(590,402)|
+10,70,Funds to conservation tillage,1252,603,60,19,8,3,0,0,0,0,0,0
+1,71,70,42,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1198,633)|
+1,72,70,35,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1316,553)|
+1,73,8,70,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1208,599)|
+10,74,NT acres funded,992,846,53,11,8,3,0,0,0,0,0,0
+1,75,30,74,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1080,862)|
+1,76,7,74,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(957,873)|
+1,77,44,74,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1011,914)|
+1,78,2,55,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(455,397)|
+10,79,funds,1042,407,18,11,8,3,0,0,0,0,0,0
+1,80,79,13,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1027,447)|
+10,81,Time,1329,678,26,11,8,2,0,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,82,81,70,0,0,0,0,1,64,0,0-0-0,|12||0-0-0,1|(1299,649)|
+10,83,Time,632,1021,26,11,8,2,0,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,84,83,24,0,0,0,0,1,64,0,0-0-0,|12||0-0-0,1|(675,1007)|
+10,85,MT farmed area,270,564,42,19,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,86,CRP to CT,253,431,46,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,87,86,2,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(247,430)|
+10,88,CT to CRP,253,431,46,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,89,88,2,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(247,430)|
+10,90,CT to MT,253,431,43,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,91,90,2,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(249,430)|
+10,92,MT to CT,253,431,43,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,93,92,2,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(249,430)|
+10,94,CRP to NT,1054,1162,47,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,95,94,1,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(894,955)|
+10,96,MT to NT,1054,1162,43,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,97,96,1,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(894,955)|
+10,98,NT to CRP,1054,1162,47,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,99,98,1,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(894,955)|
+10,100,NT to MT,1054,1162,43,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,101,100,1,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(894,955)|
+10,102,NT MT word of mouth efficiency,898,569,58,19,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,103,Erosion CT,476,996,46,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,104,Erosion MT,476,996,48,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,105,104,17,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(476,988)|
+10,106,till funding switch,799,874,37,19,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,107,106,24,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(785,919)|
+10,108,till funding switch,1495,570,37,19,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,109,108,35,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(1398,547)|
+10,110,till funding switch,1468,683,37,19,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,111,110,70,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(1373,648)|
+10,112,MT payment,1418,764,50,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,113,Funds to CRP percent,799,874,55,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,114,113,24,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(786,915)|
+10,115,Funds to CRP,1495,570,51,19,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,116,115,35,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(1391,545)|
+10,117,Funds to CRP,1468,683,51,19,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,118,117,70,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(1366,645)|
+10,119,CRP data switch,1468,683,37,19,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,120,119,70,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(1373,648)|
+1,121,51,1,0,1,0,0,1,64,1,0-0-0,|12||0-0-0,1|(779,509)|
+1,122,51,2,0,1,0,0,1,64,1,0-0-0,|12||0-0-0,1|(543,393)|
+10,123,Erosion Rate CT,242,896,49,20,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,124,Erosion CT,335,966,44,11,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,125,123,124,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(289,931)|
+10,126,CT farmed area,342,842,48,20,8,2,0,10,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,127,126,124,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(338,901)|
+10,128,erosion CRP,476,996,50,11,8,2,1,2,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,129,128,17,0,1,0,0,1,64,0,0-0-0,|12||0-0-0,1|(476,988)|
+1,130,124,17,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(430,978)|
+1,131,74,60,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(896,755)|
+10,132,NT payment ratio,1147,688,45,19,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,133,132,42,0,1,0,0,0,64,0,-1--1--1,,1|(1147,669)|
+10,134,Cnstant reduced tillage funding,1252,641,57,19,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,135,134,70,0,1,0,0,0,64,0,-1--1--1,,1|(1252,622)|
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*CT and CRP
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,120,0
+10,1,CT farmed area,1175,292,182,274,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+10,2,CRP area,-94,294,115,275,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|20||0-0-0
+1,3,5,2,4,0,0,22,0,0,0,-1--1--1,,1|(266,75)|
+1,4,5,1,100,0,0,22,0,0,0,-1--1--1,,1|(758,75)|
+11,5,508,518,75,6,8,34,3,0,0,1,0,0,0
+10,6,CT to CRP,518,97,61,14,40,131,0,8,-1,0,0,0,0-0-0,0-0-0,|20||0-0-0
+1,7,9,1,4,0,0,22,0,0,0,-1--1--1,,1|(799,539)|
+1,8,9,2,100,0,0,22,0,0,0,-1--1--1,,1|(307,539)|
+11,9,1468,600,539,6,8,34,3,0,0,1,0,0,0
+10,10,CRP to CT,600,561,61,14,40,3,0,8,-1,0,0,0,0-0-0,0-0-0,|20||0-0-0
+1,11,1,30,1,0,43,0,3,128,0,0-128-0,|12||0-0-0,1|(744,326)|
+10,12,CRP funds,-518,-259,75,14,8,2,1,11,-1,0,0,0,128-128-128,0-0-0,|20||128-128-128
+10,13,CRP word of mouth,321,-128,56,19,8,3,0,0,0,0,0,0
+10,14,total area,265,153,39,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,15,14,13,0,0,0,0,0,128,0,-1--1--1,,1|(290,23)|
+10,16,CRP word of mounth efficiency,276,-231,70,19,8,3,0,0,0,0,0,0
+1,17,16,13,0,0,0,0,0,128,0,-1--1--1,,1|(295,-185)|
+1,18,2,13,1,0,43,0,3,128,0,0-128-0,|12||0-0-0,1|(-32,-116)|
+10,19,CRP fund effectiveness,737,-102,41,19,8,3,0,0,0,0,0,0
+10,20,CRP payment,-453,-271,54,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,21,nonCRP area,408,316,57,19,8,3,0,0,0,0,0,0
+1,22,2,21,1,0,45,0,3,128,0,0-128-0,|12||0-0-0,1|(315,326)|
+1,23,21,19,1,0,45,0,3,128,0,0-128-0,|12||0-0-0,1|(590,207)|
+1,24,14,21,1,0,0,0,0,128,0,-1--1--1,,1|(359,224)|
+10,25,CRP contract length,764,794,83,16,8,130,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,26,2,28,1,0,43,0,3,128,0,128-0-128,|12||0-0-0,1|(114,790)|
+1,27,21,30,1,0,45,0,3,128,0,128-0-128,|12||0-0-0,1|(448,361)|
+10,28,CRP ended contract due to completion,722,709,66,19,8,131,0,0,0,0,0,0
+1,29,25,28,0,0,0,0,0,128,0,-1--1--1,,1|(747,759)|
+10,30,nonCRP CT Ratio,491,434,58,11,8,3,0,0,0,0,0,0
+1,31,28,10,0,0,43,0,3,128,0,128-0-128,|12||0-0-0,1|(663,637)|
+1,32,30,10,0,0,43,0,3,128,0,64-160-98,|12||0-0-0,1|(538,490)|
+10,33,CRP ended contracts due to price,404,660,69,19,8,3,0,0,0,0,0,0
+1,34,2,33,1,0,43,0,3,128,0,128-0-128,|12||0-0-0,1|(166,684)|
+1,35,33,10,1,0,43,0,3,128,0,128-0-128,|12||0-0-0,1|(548,608)|
+12,36,0,768,-209,20,20,5,135,0,1,-1,0,0,0,128-0-128,0-0-0,|12||0-0-0
+ --
+12,37,0,523,182,20,20,5,7,0,1,-1,0,0,0,0-128-0,0-0-0,|12||0-0-0
++
+12,38,0,141,-33,20,20,4,7,0,1,-1,0,0,0,0-128-0,0-0-0,|12||0-0-0
++
+12,39,0,276,639,20,20,5,7,0,1,-1,0,0,0,128-0-128,0-0-0,|12||0-0-0
+ --
+12,40,0,803,436,20,20,5,7,0,1,-1,0,0,0,64-160-98,0-0-0,|12||0-0-0
++
+12,41,0,351,-57,20,20,4,7,0,1,-1,0,0,0,128-0-128,0-0-0,|12||0-0-0
+ --
+12,42,0,420,773,20,20,5,7,0,1,-1,0,0,0,128-0-128,0-0-0,|12||0-0-0
+ --
+1,43,14,1,0,0,0,0,0,64,1,-1--1--1,,1|(641,209)|
+1,44,14,2,0,0,0,0,0,64,1,-1--1--1,,1|(135,203)|
+10,45,CRP to NT,149,520,47,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,46,45,2,0,1,0,0,0,64,0,-1--1--1,,1|(84,459)|
+10,47,NT to CRP,149,520,47,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,48,47,2,0,1,0,0,0,64,0,-1--1--1,,1|(84,459)|
+10,49,CT to MT,813,-175,43,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,50,49,1,0,1,0,0,0,64,0,-1--1--1,,1|(902,-59)|
+10,51,CT to Nt,813,-175,39,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,52,51,1,0,1,0,0,0,64,0,-1--1--1,,1|(902,-59)|
+10,53,MT to CT,813,-175,43,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,54,53,1,0,1,0,0,0,64,0,-1--1--1,,1|(902,-59)|
+10,55,NT to CT,813,-175,42,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,56,55,1,0,1,0,0,0,64,0,-1--1--1,,1|(902,-59)|
+10,57,CRP to MT,149,520,48,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,58,57,2,0,1,0,0,0,64,0,-1--1--1,,1|(84,459)|
+10,59,MT to CRP,149,520,48,11,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,60,59,2,0,1,0,0,0,64,0,-1--1--1,,1|(84,459)|
+12,61,0,815,27,18,18,5,135,0,1,-1,0,0,0,128-0-128,0-0-0,|12||0-0-0
+ --
+10,62,CRP CT fund effectiveness,518,130,49,19,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,63,CRP CT word of mouth,518,130,61,19,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,64,CRP CT fund effectiveness,909,-22,45,19,8,3,0,0,0,0,0,0
+10,65,CRP CT word of mouth,524,-72,56,19,8,3,0,0,0,0,0,0
+1,66,19,64,0,0,0,0,0,64,0,-1--1--1,,1|(816,-64)|
+1,67,1,64,0,0,0,0,0,64,0,-1--1--1,,1|(963,42)|
+1,68,13,65,0,0,0,0,0,64,0,-1--1--1,,1|(415,-101)|
+1,69,1,65,1,0,0,0,0,64,0,-1--1--1,,1|(843,-281)|
+1,70,65,6,1,0,0,0,0,128,0,-1--1--1,,1|(494,54)|
+1,71,64,6,1,0,0,0,0,128,0,-1--1--1,,1|(619,0)|
+10,72,CRP acres funded,737,-64,40,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,73,72,19,0,0,0,0,0,64,0,-1--1--1,,1|(737,-83)|
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 8
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,95,0
+10,1,CRP pre,167,-171,29,11,8,3,0,0,0,0,0,0
+10,2,CRP area,92,-245,41,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,3,total area,330,-91,39,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,4,MT farmed area,288,-247,42,19,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,5,CT farmed area,461,-249,59,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,6,NT farmed area,659,-228,60,11,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,7,mt pre,281,-169,22,11,8,3,0,0,0,0,0,0
+10,8,ct pre,416,-164,20,11,8,3,0,0,0,0,0,0
+10,9,nt pre,540,-164,20,11,8,3,0,0,0,0,0,0
+1,10,2,1,0,0,0,0,0,128,0,-1--1--1,,1|(124,-212)|
+1,11,4,7,0,0,0,0,0,128,0,-1--1--1,,1|(284,-210)|
+1,12,5,8,0,0,0,0,0,128,0,-1--1--1,,1|(441,-212)|
+1,13,6,9,0,0,0,0,0,128,0,-1--1--1,,1|(605,-198)|
+1,14,3,1,0,0,0,0,0,128,0,-1--1--1,,1|(254,-127)|
+1,15,3,7,0,0,0,0,0,128,0,-1--1--1,,1|(309,-124)|
+1,16,3,8,0,0,0,0,0,128,0,-1--1--1,,1|(367,-123)|
+1,17,3,9,1,0,0,0,0,128,0,-1--1--1,,1|(517,-159)|
+12,18,1117682,637,169,150,150,3,44,0,0,1,0,0,0
+CT_pre
+12,19,1117680,955,170,150,150,3,44,0,0,1,0,0,0
+mt_pre
+12,20,6100376,1274,168,150,150,3,44,0,0,1,0,0,0
+NT_pre
+12,21,5706874,318,169,150,150,3,44,0,0,1,0,0,0
+CRP_pre
+12,22,986558,948,359,80,20,3,124,0,0,0,0,0,0
+MT word of mounth effectiveness,0.005,0.2,0.005
+12,23,986616,1260,506,80,20,3,124,0,0,0,0,0,0
+NT out coefficient,0.005,0.2,0.005
+12,24,986622,1261,364,80,20,3,124,0,0,0,0,0,0
+NT CT word of mouth effectiveness,0.005,0.2,0.005
+12,25,1903458,1260,435,80,20,3,124,0,0,0,0,0,0
+NT MT word of mouth efficiency,0.005,0.2,0.005
+12,26,8001474,949,508,80,20,3,124,0,0,0,0,0,0
+MT out Coefficient,0.005,0.2,0.005
+12,27,5248888,289,359,80,20,3,124,0,0,0,0,0,0
+CRP word of mounth efficiency,0.005,0.1,0.005
+12,28,8787858,278,450,80,20,3,124,0,0,0,0,0,0
+CRP contract length,2,15,1
+12,29,1314316,556,370,80,20,3,92,0,0,0,0,0,0
+annual funds,0,1e+006,10000
+12,30,1052126,500,454,80,20,3,92,0,0,0,0,0,0
+Funds to CRP percent,0,1,0.025
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 9
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,50,0
+///---\\\
+:TABLE total_erosion_
+:TITLE Erosion Rate Comparison
+:PRETTYNUM
+:FIRST-CELLWIDTH 30
+:CELLWIDTH 14
+:FONT Times New Roman|12||0-0-0
+:VAR summed total erosion rate
+:DATASET No_Conservation
+:VAR summed total erosion rate
+:DATASET funds_non_target
+:VAR summed total erosion rate
+:DATASET Funds_non_traget_OC
+:VAR summed total erosion rate
+:DATASET Targeting
+:VAR summed total erosion rate
+:DATASET Targeting_OC
+
+:GRAPH CRP
+:TITLE CRP
+:SCALE
+:VAR CRP Area [land type]
+:UNITS Area (Ha)
+:Y-MAX 2500
+
+:GRAPH CT
+:TITLE CT
+:SCALE
+:VAR CT farmed area[land type]
+:UNITS Area (Ha)
+:Y-MAX 2500
+
+:GRAPH MT
+:TITLE MT
+:SCALE
+:VAR MT farmed area[land type]
+:UNITS Area (Ha)
+:Y-MAX 2500
+
+:GRAPH NT
+:TITLE NT
+:SCALE
+:VAR NT farmed area[land type]
+:UNITS Area (Ha)
+:Y-MAX 2500
+
+:GRAPH Total_erosion_rate
+:TITLE Total erosion rate
+:X-MAX 50
+:SCALE
+:VAR total erosion rate[land type]
+:UNITS Erosion rate (Mg/Ha/Yr)
+
+:GRAPH Average_total_erosion_rate
+:TITLE Average_total_erosion_rate
+:SCALE
+:VAR summed total erosion rate
+
+:GRAPH Erosion_per_dollar
+:TITLE Erosion reduction per dollar
+:SCALE
+:VAR erosion reduction per conservation funds
+:UNITS Mg/Dollar
+
+:GRAPH Average_erosion_rate
+:TITLE Average erosion rate
+:X-MAX 50
+:SCALE
+:VAR summed total erosion rate
+
+:GRAPH Erosion_Rate_per_treatment
+:TITLE Erosion Rate
+:SCALE
+:VAR summed total erosion rate
+:UNITS Erosion rate (Mg/ha/yr)
+:DATASET no funding
+:VAR summed total erosion rate
+:DATASET non-targeted
+:VAR summed total erosion rate
+:DATASET targeted
+:VAR summed total erosion rate
+:DATASET cost funt.vdf
+:VAR summed total erosion rate
+:DATASET price func no funds
+:VAR summed total erosion rate
+:DATASET price func targeted
+
+:GRAPH Erosion_per_dollar_treatment
+:TITLE Erosion per Dollar
+:SCALE
+:VAR erosion per conservation funds
+:UNITS Erosion (Mg/dollar)
+:DATASET non-targeted
+:VAR erosion per conservation funds
+:DATASET targeted
+:VAR erosion per conservation funds
+:DATASET cost funt
+:VAR erosion per conservation funds
+:DATASET price func targeted
+
+:GRAPH GRAPH
+:TITLE GRAPH
+:SCALE
+:VAR erosion per conservation funds
+:DATASET cost funt
+
+:GRAPH GRAPH_0
+:TITLE GRAPH_0
+:SCALE
+:VAR total erosion rate
+:DATASET runs/funds_non_target
+
+:GRAPH erosion_scenarios
+:TITLE Erosion Scenarios
+:SCALE
+:VAR summed total erosion rate
+:DATASET No_Conservation
+:VAR summed total erosion rate
+:DATASET funds_non_target
+:VAR summed total erosion rate
+:DATASET Funs_non_traget_OC
+:VAR summed total erosion rate
+:DATASET Targeting
+:VAR summed total erosion rate
+:DATASET tarting_oc
+
+:TABLE Erosion_per_dollar_all
+:TITLE Erosion reduction per dollar
+:PRETTYNUM
+:FIRST-CELLWIDTH 30
+:CELLWIDTH 14
+:FONT Times New Roman|12||0-0-0
+:VAR erosion reduction per conservation funds
+:DATASET funds_non_target
+:VAR erosion reduction per conservation funds
+:DATASET Targeting
+:VAR erosion reduction per conservation funds
+:DATASET Funds_non_traget_OC
+:VAR erosion reduction per conservation funds
+:DATASET Targeting_OC
+:VAR erosion reduction per conservation funds
+:DATASET No_Conservation
+:VAR erosion reduction per conservation funds
+
+:GRAPH Fund_success
+:TITLE Erosion Reduction Effeciveness
+:SCALE
+:VAR erosion reduction per conservation funds
+:DATASET No_Conservation
+:VAR erosion reduction per conservation funds
+:DATASET funds_non_target
+:VAR erosion reduction per conservation funds
+:DATASET Funds_non_traget_OC
+:VAR erosion reduction per conservation funds
+:DATASET Targeting
+:VAR erosion reduction per conservation funds
+:DATASET Targeting_OC
+
+:GRAPH total_erosion_single
+:TITLE Total erosion rate
+:SCALE
+:VAR summed total erosion rate
+
+:GRAPH CRP_pre
+:TITLE CRP percent
+:SCALE
+:VAR CRP pre
+:Y-MIN 0
+:Y-MAX 1
+:VAR CRP data percent
+
+:GRAPH mt_pre
+:TITLE MT Percent
+:SCALE
+:VAR mt pre
+:Y-MIN 0
+:Y-MAX 1
+:VAR mt data percent
+
+:GRAPH NT_pre
+:TITLE NT Precent
+:SCALE
+:VAR nt pre
+:Y-MIN 0
+:Y-MAX 1
+:VAR nt percent data
+
+:GRAPH CT_pre
+:TITLE CT percent
+:SCALE
+:VAR ct pre
+:Y-MIN 0
+:Y-MAX 1
+:VAR ct data percent
+
+:GRAPH Policy_Testing:_erosion_
+:TITLE Policy Testing: erosion rate
+:SCALE
+:VAR Total Erosion
+:DATASET man_baseline
+:VAR Total Erosion
+:DATASET targeting
+:VAR Total Erosion
+:DATASET targeting2
+:VAR Total Erosion
+:DATASET targeting3
+
+:GRAPH Policy_Test:_Fund_effect
+:TITLE Policy Test: Fund effectiveness
+:SCALE
+:VAR erosion reduction per conservation funds
+:DATASET man_baseline
+:VAR erosion reduction per conservation funds
+:DATASET targeting
+:VAR erosion reduction per conservation funds
+:DATASET targeting2
+:VAR erosion reduction per conservation funds
+:DATASET targeting3
+:L<%^E!@
+9:F:\Dropbox\active\SD_Conservation_adoption\20.07.15\sense
+11:Land_use_1.voc
+12:opt1.1
+13:F:\Dropbox\active\SD_Conservation_adoption\20.07.15\targeting_1,F:\Dropbox\active\SD_Conservation_adoption\10.07.15\baseline,7_15_20_baseline,baseline_7_15_22
+18:sense.vsc
+20:ct2nt_control.lst
+15:0,0,0,1,0,0
+19:60,0
+27:2,
+34:0,
+4:Time
+5:Funds to CRP percent
+35:Date
+36:YYYY-MM-DD
+37:1975
+38:1
+39:1
+40:0
+41:0
+42:1
+24:1975
+25:2025
+26:2025
+6:hc1
+6:hc2
+6:hc3
+6:hc4
+6:hc5
