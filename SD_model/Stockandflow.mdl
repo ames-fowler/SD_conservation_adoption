@@ -1,0 +1,245 @@
+{UTF-8}
+Adoption rate=A FUNCTION OF(Adoption rate,NT adoption fund effctiveness,NT to CT word of mouth adoption\
+		) ~~|
+Adoption rate=
+	~	
+	~		|
+
+Annual funds  = A FUNCTION OF( )
+	~	
+	~		|
+
+Annual funds out  = A FUNCTION OF( )
+	~	
+	~		|
+
+CT erosion rate CLT 1 2 3 4 5
+	~	
+	~		|
+
+"CT farmed area [P] CLT 1 2 3 4 5"=A FUNCTION OF("CT farmed area [P] CLT 1 2 3 4 5",CT reversion\
+		,NT adoption) ~~|
+"CT farmed area [P] CLT 1 2 3 4 5"=
+	~	
+	~		|
+
+NT to CT word of mouth adoption=A FUNCTION OF(NT to CT word of mouth adoption,"NT farmed area [A] CLT 1 2 3 4 5"\
+		,"NT to CT word of mouth effectiveness[ci]","Total area [N]") ~~|
+NT to CT word of mouth adoption=
+	~	
+	~		|
+
+"NT to CT word of mouth effectiveness[ci]"=A FUNCTION OF("NT to CT word of mouth effectiveness[ci]"\
+		) ~~|
+"NT to CT word of mouth effectiveness[ci]"=
+	~	
+	~		|
+
+NT acres funded CLT 1 2 3 4 5  = A FUNCTION OF( NT contract length,NT funding,NT Payment\
+		)
+	~	
+	~		|
+
+NT adoption  = A FUNCTION OF( Adoption rate,"CT farmed area [P] CLT 1 2 3 4 5") ~~|
+NT adoption =
+	~	
+	~		|
+
+NT adoption fund effctiveness  = A FUNCTION OF( nonNT area,NT acres funded CLT 1 2 3 4 5\
+		) ~~|
+NT adoption fund effctiveness=
+	~	
+	~		|
+
+NT contract length  = A FUNCTION OF( )
+	~	
+	~		|
+
+NT erosion rate CLT 1 2 3 4 5
+	~	
+	~		|
+
+"NT farmed area [A] CLT 1 2 3 4 5"=A FUNCTION OF("NT farmed area [A] CLT 1 2 3 4 5",CT reversion\
+		,NT adoption) ~~|
+"NT farmed area [A] CLT 1 2 3 4 5"= INTEG (
+	NT adoption-CT reversion,
+		)
+	~	
+	~		|
+
+NT funding  = A FUNCTION OF( NT Funds CLT 1 2 3 4 5)
+	~	
+	~		|
+
+NT Funds CLT 1 2 3 4 5  = A FUNCTION OF( -NT funding,To NT)
+	~	
+	~		|
+
+NT Payment  = A FUNCTION OF( )
+	~	
+	~		|
+
+To NT  = A FUNCTION OF( Targeting NT CLT 1 2 3 4 5,Total Conservation funds)
+	~	
+	~		|
+
+Targeting NT CLT 1 2 3 4 5=A FUNCTION OF(Targeting NT CLT 1 2 3 4 5) ~~|
+Targeting NT CLT 1 2 3 4 5=
+	~	
+	~		|
+
+Total Conservation funds  = A FUNCTION OF( Annual funds,-Annual funds out)
+	~	
+	~		|
+
+CT reversion=A FUNCTION OF(CT reversion,"NT farmed area [A] CLT 1 2 3 4 5",NT out coefficient\
+		) ~~|
+CT reversion=
+	~	
+	~		|
+
+nonNT area  = A FUNCTION OF( "NT farmed area [A] CLT 1 2 3 4 5","Total area [N]")
+	~	
+	~		|
+
+NT out coefficient  = A FUNCTION OF( )
+	~	
+	~		|
+
+"Total area [N]"  = A FUNCTION OF( )
+	~	
+	~		|
+
+Total Erosion  = A FUNCTION OF( CT erosion rate CLT 1 2 3 4 5,"CT farmed area [P] CLT 1 2 3 4 5"\
+		,NT erosion rate CLT 1 2 3 4 5,"NT farmed area [A] CLT 1 2 3 4 5")
+	~	
+	~		|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 100
+	~	Month
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 0
+	~	Month
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP
+	~	Month [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 1
+	~	Month [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|96,96,100,0
+10,1,"NT farmed area [A] CLT 1 2 3 4 5",823,110,71,27,3,131,0,0,0,0,0,0
+10,2,"CT farmed area [P] CLT 1 2 3 4 5",643,353,76,33,3,131,0,0,0,0,0,0
+1,3,5,2,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(582,272)|
+1,4,5,1,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(582,110)|
+11,5,236,582,219,8,6,33,3,0,0,4,0,0,0
+10,6,CT reversion,636,219,46,19,40,131,0,0,-1,0,0,0
+1,7,9,1,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(884,189)|
+1,8,9,2,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(884,353)|
+11,9,252,884,248,8,6,33,3,0,0,4,0,0,0
+10,10,NT adoption,938,248,46,21,40,131,0,0,-1,0,0,0
+10,11,"NT to CT word of mouth effectiveness[ci]",985,362,74,28,8,131,0,0,0,0,0,0
+10,12,"Total area [N]",1164,108,46,11,8,3,0,0,0,0,0,0
+10,13,nonNT area,998,83,39,11,8,3,0,0,0,0,0,0
+10,14,NT adoption fund effctiveness,1111,147,57,19,8,131,0,0,0,0,0,0
+10,15,NT to CT word of mouth adoption,1145,300,79,19,8,3,0,0,0,0,0,0
+1,16,11,15,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1069,329)|
+1,17,15,26,0,0,43,0,3,128,0,0-0-0,|12||0-0-0,1|(1104,267)|
+1,18,1,13,1,0,45,0,3,128,0,0-0-0,|12||0-0-0,1|(977,98)|
+1,19,12,13,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1087,73)|
+1,20,13,14,1,0,45,0,3,128,0,0-0-0,|12||0-0-0,1|(1058,94)|
+1,21,14,26,1,0,43,0,3,128,0,0-0-0,|12||0-0-0,1|(1106,173)|
+1,22,2,10,1,0,43,0,3,128,0,0-0-0,|12||0-0-0,1|(775,290)|
+10,23,NT out coefficient,645,132,57,11,8,3,0,0,0,0,0,0
+1,24,23,6,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(625,158)|
+1,25,1,6,1,0,43,0,3,128,0,0-0-0,|12||0-0-0,1|(678,220)|
+10,26,Adoption rate,1063,235,50,11,8,3,0,0,0,0,0,0
+1,27,26,10,0,0,43,0,3,128,0,0-0-0,|12||0-0-0,1|(1005,240)|
+10,28,"CT farmed area [P] CLT 1 2 3 4 5",1288,191,74,19,8,130,1,1,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,29,NT erosion rate CLT 1 2 3 4 5,1321,80,51,25,8,131,0,0,0,0,0,0
+10,30,CT erosion rate CLT 1 2 3 4 5,1320,267,54,24,8,131,0,0,0,0,0,0
+10,31,Total Erosion,1323,164,43,11,8,3,0,0,0,0,0,0
+1,32,29,31,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1321,122)|
+1,33,30,31,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1320,215)|
+1,34,1,31,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1078,52)|
+1,35,2,31,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1191,334)|
+10,36,Total Conservation funds,805,462,68,30,3,131,0,0,0,0,0,0
+12,37,48,565,458,10,8,0,3,0,0,-1,0,0,0
+1,38,40,36,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(697,459)|
+1,39,40,37,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(610,459)|
+11,40,48,651,459,6,8,34,3,0,0,1,0,0,0
+10,41,Annual funds,651,478,41,11,40,3,0,0,-1,0,0,0
+12,42,48,1055,462,10,8,0,3,0,0,-1,0,0,0
+1,43,45,42,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(996,462)|
+1,44,45,36,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(904,462)|
+11,45,48,942,462,6,8,34,3,0,0,1,0,0,0
+10,46,Annual funds out,942,481,53,11,40,3,0,0,-1,0,0,0
+10,47,NT Funds CLT 1 2 3 4 5,818,587,49,32,3,131,0,0,0,0,0,0
+10,48,Targeting NT CLT 1 2 3 4 5,791,521,47,20,8,131,0,0,0,0,0,0
+12,49,48,590,576,10,8,0,3,0,0,-1,0,0,0
+1,50,52,47,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(729,576)|
+1,51,52,49,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(639,576)|
+11,52,48,684,576,6,8,34,3,0,0,1,0,0,0
+10,53,To NT,684,595,23,11,40,3,0,0,-1,0,0,0
+12,54,48,999,575,10,8,0,3,0,0,-1,0,0,0
+1,55,57,54,4,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(957,575)|
+1,56,57,47,100,0,0,22,1,0,0,0-0-0,|12||0-0-0,1|(890,575)|
+11,57,48,919,575,6,8,34,3,0,0,1,0,0,0
+10,58,NT funding,919,594,36,11,40,3,0,0,-1,0,0,0
+1,59,36,52,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(687,523)|
+1,60,48,52,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(715,535)|
+1,61,47,57,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(883,549)|
+10,62,NT Payment,1042,549,43,12,8,131,0,0,0,0,0,0
+10,63,NT contract length,1094,515,59,11,8,3,0,0,0,0,0,0
+10,64,NT acres funded CLT 1 2 3 4 5,1117,616,54,19,8,3,0,0,0,0,0,0
+1,65,58,64,0,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1002,603)|
+1,66,62,64,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1087,579)|
+1,67,63,64,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1125,573)|
+1,68,64,14,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1273,387)|
+1,69,1,15,1,0,43,0,3,128,0,0-0-0,|12||0-0-0,1|(1121,239)|
+1,70,12,15,1,0,0,0,1,128,0,0-0-0,|12||0-0-0,1|(1198,219)|
+12,71,0,954,195,20,20,4,7,0,0,-1,0,0,0
+A +
+12,72,0,824,305,20,20,4,7,0,0,-1,0,0,0
+B -
+12,73,0,679,166,20,20,4,7,0,0,-1,0,0,0
+C -
+12,74,0,741,237,20,20,5,7,0,0,-1,0,0,0
+D +
+///---\\\
+:L<%^E!@
+9:Current
+15:0,0,0,0,0,0
+19:100,0
+27:2,
+34:0,
+5:Adoption rate
+35:Date
+36:YYYY-MM-DD
+37:2000
+38:1
+39:1
+40:2
+41:0
+42:1
+24:0
+25:0
+26:0
