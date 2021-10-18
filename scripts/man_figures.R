@@ -32,20 +32,6 @@ g_legend<-function(a.gplot){
   return(legend)}
 
 ### site map ==========----
-
-landtypes_man<-raster("./Data/processed_data/landtypes/landtype_2.tif")
-WA <- map_data("state", c("washington"))
-coordinates(WA) <- c( "long","lat")
-crs(WA) <- CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
-WA <- spTransform(WA, crs(thorn_mask))
-WA <- as.data.frame(WA)
-
-WA_co <- map_data("county", c("washington"))
-coordinates(WA_co) <- c( "long","lat")
-crs(WA_co) <- CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
-WA_co <- spTransform(WA_co, crs(thorn_mask))
-WA_co <- as.data.frame(WA_co)
-
 huc12 <- readOGR(dsn = file.path("./Data/extent/HUC12.shp"), stringsAsFactors = F)
 xy <- WA[,c(1,2)]
 # xy <- WA_co[,c(1,2)]
@@ -67,6 +53,21 @@ spdf_utm <- spTransform(spdf, crs(thorn_mask))
 thorn_mask_ll <- spTransform(thorn_mask, crs(spdf_utm)) ##clean up -- moving to utm
 thorn_man_ll <- projectRaster(thorn_man, crs = crs(spdf_utm), method = 'ngb')
 thorn_man_ll <- crop(thorn_man_ll, thorn_mask_ll)
+
+
+landtypes_man<-raster("./Data/processed_data/landtypes/landtype_2.tif")
+WA <- map_data("state", c("washington"))
+coordinates(WA) <- c( "long","lat")
+crs(WA) <- CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+WA <- spTransform(WA, crs(thorn_mask))
+WA <- as.data.frame(WA)
+
+WA_co <- map_data("county", c("washington"))
+coordinates(WA_co) <- c( "long","lat")
+crs(WA_co) <- CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
+WA_co <- spTransform(WA_co, crs(thorn_mask))
+WA_co <- as.data.frame(WA_co)
+
 
 # unique(thorn_man_ll)
 
